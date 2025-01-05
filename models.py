@@ -29,12 +29,8 @@ class AvailableDay(db.Model):
 
 class Appointment(db.Model):
     """
-    Repräsentiert einen gebuchten Termin mit:
-    - Eindeutiger Terminnummer
-    - Terminart
-    - Name, E-Mail des Kunden
-    - Datum & Uhrzeit
-    - Status (z.B. 'Angemeldet' oder 'Abgelehnt')
+    Repräsentiert einen gebuchten Termin mit einer eindeutigen Nummer, 
+    Terminart, Name, E-Mail, Datum und Uhrzeit.
     """
     id = db.Column(db.Integer, primary_key=True)
     appointment_number = db.Column(db.Integer, unique=True, nullable=False)
@@ -43,7 +39,7 @@ class Appointment(db.Model):
     customer_email = db.Column(db.String(100), nullable=False)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.String(20), default='Angemeldet')
+    status = db.Column(db.String(20), default='Angemeldet')  # Angemeldet, Abgelehnt
 
     type = db.relationship('AppointmentType', backref=db.backref('appointments', lazy=True))
 

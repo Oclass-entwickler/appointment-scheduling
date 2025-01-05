@@ -2,84 +2,139 @@
 {% block content %}
 <h2>Admin-Bereich</h2>
 
+<!-- Mehrere Tage auf einmal hinzufügen -->
+<div class="card mb-4">
+  <div class="card-header">
+    Mehrere Tage hinzufügen (Startdatum, Enddatum, Start- und Endzeit)
+  </div>
+  <div class="card-body">
+    <form action="{{ url_for('add_multiple_days') }}" method="POST">
+      {{ day_form.hidden_tag() }}
+      <div class="form-row">
+        <div class="form-group col-md-3">
+          {{ day_form.start_date.label }}
+          {{ day_form.start_date(class="form-control") }}
+        </div>
+        <div class="form-group col-md-3">
+          {{ day_form.end_date.label }}
+          {{ day_form.end_date(class="form-control") }}
+        </div>
+        <div class="form-group col-md-3">
+          {{ day_form.start_time.label }}
+          {{ day_form.start_time(class="form-control") }}
+        </div>
+        <div class="form-group col-md-3">
+          {{ day_form.end_time.label }}
+          {{ day_form.end_time(class="form-control") }}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">{{ day_form.submit.label }}</button>
+    </form>
+  </div>
+</div>
+
+<!-- Neue Terminart hinzufügen -->
+<div class="card mb-4">
+  <div class="card-header">
+    Neue Terminart hinzufügen
+  </div>
+  <div class="card-body">
+    <form action="{{ url_for('add_appointment_type') }}" method="POST">
+      {{ type_form.hidden_tag() }}
+      <div class="form-row">
+        <div class="form-group col-md-8">
+          {{ type_form.name.label }}
+          {{ type_form.name(class="form-control") }}
+        </div>
+        <div class="form-group col-md-4">
+          {{ type_form.duration.label }}
+          {{ type_form.duration(class="form-control") }}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">{{ type_form.submit.label }}</button>
+    </form>
+  </div>
+</div>
+
+<!-- Anzeige der verfügbaren Tage -->
 <h3>Verfügbare Tage</h3>
-<a href="{{ url_for('add_available_day') }}" class="btn btn-success mb-2">Verfügbaren Tag hinzufügen</a>
 <table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Datum</th>
-            <th>Startzeit</th>
-            <th>Endzeit</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for day in available_days %}
-        <tr>
-            <td>{{ day.date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ day.start_time.strftime('%H:%M') }}</td>
-            <td>{{ day.end_time.strftime('%H:%M') }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th>Datum</th>
+      <th>Startzeit</th>
+      <th>Endzeit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in days %}
+    <tr>
+      <td>{{ d.date }}</td>
+      <td>{{ d.start_time }}</td>
+      <td>{{ d.end_time }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 
+<!-- Anzeige aller Terminarten -->
 <h3>Terminarten</h3>
-<a href="{{ url_for('add_appointment_type') }}" class="btn btn-success mb-2">Terminart hinzufügen</a>
 <table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Dauer (Minuten)</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for type in types %}
-        <tr>
-            <td>{{ type.name }}</td>
-            <td>{{ type.duration }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Dauer (Minuten)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in types %}
+    <tr>
+      <td>{{ t.name }}</td>
+      <td>{{ t.duration }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 
+<!-- Anzeige aller Termine -->
 <h3>Alle Termine</h3>
 <table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Termin Nummer</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Terminart</th>
-            <th>Datum</th>
-            <th>Uhrzeit</th>
-            <th>Status</th>
-            <th>Aktionen</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for appointment in appointments %}
-        <tr>
-            <td>{{ appointment.appointment_number }}</td>
-            <td>{{ appointment.customer_name }}</td>
-            <td>{{ appointment.customer_email }}</td>
-            <td>{{ appointment.type.name }}</td>
-            <td>{{ appointment.date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ appointment.time.strftime('%H:%M') }}</td>
-            <td>{{ appointment.status }}</td>
-            <td>
-                {% if appointment.status != 'Abgelehnt' %}
-                <form action="{{ url_for('reject_appointment', appointment_id=appointment.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-sm" 
-                            onclick="return confirm('Sind Sie sicher, dass Sie diesen Termin ablehnen möchten?');">
-                        Ablehnen
-                    </button>
-                </form>
-                {% else %}
-                <span class="text-muted">Abgelehnt</span>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th>Nr.</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Terminart</th>
+      <th>Datum</th>
+      <th>Uhrzeit</th>
+      <th>Status</th>
+      <th>Aktion</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for appt in appointments %}
+    <tr>
+      <td>{{ appt.appointment_number }}</td>
+      <td>{{ appt.customer_name }}</td>
+      <td>{{ appt.customer_email }}</td>
+      <td>{{ appt.type.name }}</td>
+      <td>{{ appt.date }}</td>
+      <td>{{ appt.time }}</td>
+      <td>{{ appt.status }}</td>
+      <td>
+        {% if appt.status != 'Abgelehnt' %}
+        <form action="{{ url_for('reject_appointment', appointment_id=appt.id) }}" method="POST" style="display:inline;">
+          <button type="submit" class="btn btn-danger btn-sm" 
+                  onclick="return confirm('Diesen Termin wirklich ablehnen?');">
+            Ablehnen
+          </button>
+        </form>
+        {% else %}
+        <span class="text-muted">Abgelehnt</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 {% endblock %}
