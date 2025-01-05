@@ -10,7 +10,7 @@ from forms import (
 )
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
-
+#
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
