@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Termin buchen – Schritt 2: Freien Termin auswählen</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.timeslot.label }}
+        {{ form.timeslot(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.customer_name.label }}
+        {{ form.customer_name(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.customer_email.label }}
+        {{ form.customer_email(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syrische Botschaft - Terminvergabesystem</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/api/placeholder/1920/1080');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 6rem 0;
+        }
+        .btn-custom {
+            padding: 0.8rem 2rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .feature-card {
+            border: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 mb-4">Willkommen beim Terminvergabesystem<br>der Syrischen Botschaft</h1>
+            <p class="lead mb-5">Einfach und schnell Ihren Termin online buchen und verwalten</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('book_select_type') }}" class="btn btn-primary btn-lg btn-custom">
+                    Termin buchen
+                </a>
+                <a href="{{ url_for('check_status') }}" class="btn btn-light btn-lg btn-custom">
+                    Status prüfen
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card card h-100 p-4 text-center">
+                    <div class="icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <h3 class="h5 mb-3">Flexible Terminauswahl</h3>
+                    <p class="text-muted">Wählen Sie aus verschiedenen verfügbaren Terminen den für Sie passenden aus.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card card h-100 p-4 text-center">
+                    <div class="icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <h3 class="h5 mb-3">Einfache Verwaltung</h3>
+                    <p class="text-muted">Verwalten Sie Ihre Termine bequem online und behalten Sie den Überblick.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card card h-100 p-4 text-center">
+                    <div class="icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                    </div>
+                    <h3 class="h5 mb-3">Statusübersicht</h3>
+                    <p class="text-muted">Überprüfen Sie jederzeit den aktuellen Status Ihres Termins.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

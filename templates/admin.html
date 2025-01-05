@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Admin-Bereich</h2>
+
+<h3>Verfügbare Tage</h3>
+<a href="{{ url_for('add_available_day') }}" class="btn btn-success mb-2">Verfügbaren Tag hinzufügen</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Startzeit</th>
+            <th>Endzeit</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for day in available_days %}
+        <tr>
+            <td>{{ day.date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ day.start_time.strftime('%H:%M') }}</td>
+            <td>{{ day.end_time.strftime('%H:%M') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Terminarten</h3>
+<a href="{{ url_for('add_appointment_type') }}" class="btn btn-success mb-2">Terminart hinzufügen</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Dauer (Minuten)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for type in types %}
+        <tr>
+            <td>{{ type.name }}</td>
+            <td>{{ type.duration }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Alle Termine</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Termin Nummer</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Terminart</th>
+            <th>Datum</th>
+            <th>Uhrzeit</th>
+            <th>Status</th>
+            <th>Aktionen</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for appointment in appointments %}
+        <tr>
+            <td>{{ appointment.appointment_number }}</td>
+            <td>{{ appointment.customer_name }}</td>
+            <td>{{ appointment.customer_email }}</td>
+            <td>{{ appointment.type.name }}</td>
+            <td>{{ appointment.date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ appointment.time.strftime('%H:%M') }}</td>
+            <td>{{ appointment.status }}</td>
+            <td>
+                {% if appointment.status != 'Abgelehnt' %}
+                <form action="{{ url_for('reject_appointment', appointment_id=appointment.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm" 
+                            onclick="return confirm('Sind Sie sicher, dass Sie diesen Termin ablehnen möchten?');">
+                        Ablehnen
+                    </button>
+                </form>
+                {% else %}
+                <span class="text-muted">Abgelehnt</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
