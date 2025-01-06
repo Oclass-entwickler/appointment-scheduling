@@ -2,27 +2,83 @@
 {% block content %}
 <h2>Admin-Bereich</h2>
 
-<h3>Verfügbare Tage</h3>
-<a href="{{ url_for('add_available_day') }}" class="btn btn-success mb-2">Verfügbaren Tag hinzufügen</a>
+<!-- Recurring Days -->
+<h3>Wiederkehrende Wochentage (Montag-Freitag) mit Datum-Beginn / Datum-Ende</h3>
+<a href="{{ url_for('add_recurring_day') }}" class="btn btn-success mb-2">Wochentag(e) hinzufügen</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Wochentag</th>
+            <th>Gültig von</th>
+            <th>Gültig bis</th>
+            <th>Start</th>
+            <th>Ende</th>
+            <th>Pause</th>
+            <th>Aktion</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for rd in recurring_days %}
+        <tr>
+            <td>
+                {% if rd.day_of_week == 0 %}Montag{% elif rd.day_of_week == 1 %}Dienstag
+                {% elif rd.day_of_week == 2 %}Mittwoch{% elif rd.day_of_week == 3 %}Donnerstag
+                {% elif rd.day_of_week == 4 %}Freitag{% endif %}
+            </td>
+            <td>{{ rd.start_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ rd.end_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ rd.start_time.strftime('%H:%M') }}</td>
+            <td>{{ rd.end_time.strftime('%H:%M') }}</td>
+            <td>
+                {% if rd.break_start and rd.break_end %}
+                  {{ rd.break_start.strftime('%H:%M') }} - {{ rd.break_end.strftime('%H:%M') }}
+                {% else %}
+                  Keine
+                {% endif %}
+            </td>
+            <td>
+                <form action="{{ url_for('delete_recurring_day', rd_id=rd.id) }}" method="POST" style="display:inline;">
+                    <button class="btn btn-danger btn-sm"
+                            onclick="return confirm('Diesen Wochentag wirklich löschen?');">
+                      Löschen
+                    </button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<!-- Excluded Days -->
+<h3>Einmalige Ausschlusstage</h3>
+<a href="{{ url_for('add_excluded_day') }}" class="btn btn-success mb-2">Ausschlusstag hinzufügen</a>
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Datum</th>
-            <th>Startzeit</th>
-            <th>Endzeit</th>
+            <th>Grund</th>
+            <th>Aktion</th>
         </tr>
     </thead>
     <tbody>
-        {% for day in available_days %}
+    {% for ex in excluded_days %}
         <tr>
-            <td>{{ day.date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ day.start_time.strftime('%H:%M') }}</td>
-            <td>{{ day.end_time.strftime('%H:%M') }}</td>
+            <td>{{ ex.date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ ex.reason }}</td>
+            <td>
+                <form action="{{ url_for('delete_excluded_day', ex_id=ex.id) }}" method="POST" style="display:inline;">
+                    <button class="btn btn-danger btn-sm"
+                            onclick="return confirm('Diesen Ausschlusstag wirklich löschen?');">
+                      Löschen
+                    </button>
+                </form>
+            </td>
         </tr>
-        {% endfor %}
+    {% endfor %}
     </tbody>
 </table>
 
+<!-- Terminarten -->
 <h3>Terminarten</h3>
 <a href="{{ url_for('add_appointment_type') }}" class="btn btn-success mb-2">Terminart hinzufügen</a>
 <table class="table table-bordered">
@@ -33,31 +89,32 @@
         </tr>
     </thead>
     <tbody>
-        {% for type in types %}
+        {% for t in types %}
         <tr>
-            <td>{{ type.name }}</td>
-            <td>{{ type.duration }}</td>
+            <td>{{ t.name }}</td>
+            <td>{{ t.duration }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
+<!-- Alle Termine -->
 <h3>Alle Termine</h3>
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Termin Nummer</th>
+            <th>Nr</th>
             <th>Name</th>
             <th>Email</th>
             <th>Terminart</th>
             <th>Datum</th>
             <th>Uhrzeit</th>
             <th>Status</th>
-            <th>Aktionen</th>
+            <th>Aktion</th>
         </tr>
     </thead>
     <tbody>
-        {% for appointment in appointments %}
+    {% for appointment in appointments %}
         <tr>
             <td>{{ appointment.appointment_number }}</td>
             <td>{{ appointment.customer_name }}</td>
@@ -69,7 +126,7 @@
             <td>
                 {% if appointment.status != 'Abgelehnt' %}
                 <form action="{{ url_for('reject_appointment', appointment_id=appointment.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-sm" 
+                    <button type="submit" class="btn btn-danger btn-sm"
                             onclick="return confirm('Sind Sie sicher, dass Sie diesen Termin ablehnen möchten?');">
                         Ablehnen
                     </button>
@@ -79,7 +136,7 @@
                 {% endif %}
             </td>
         </tr>
-        {% endfor %}
+    {% endfor %}
     </tbody>
 </table>
 {% endblock %}

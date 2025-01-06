@@ -1,18 +1,27 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, SubmitField, DateField, TimeField, IntegerField
+from wtforms import (
+    StringField, SelectField, SelectMultipleField,
+    TimeField, DateField, IntegerField, SubmitField, widgets
+)
 from wtforms.validators import DataRequired, Email, NumberRange
+
+class MultiCheckboxField(SelectMultipleField):
+    """
+    Ein Mehrfachauswahlfeld für Wochentage (z.B. Montag, Dienstag, etc.).
+    """
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
 
 class BookTypeForm(FlaskForm):
     """
-    Schritt 1: Nutzer wählt eine Terminart aus.
+    Schritt 1: Terminart auswählen.
     """
     appointment_type = SelectField('Terminart', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Weiter')
 
 class BookSlotForm(FlaskForm):
     """
-    Schritt 2: Nutzer sieht alle möglichen Zeitslots für die gewählte Terminart
-    und wählt einen aus. Zusätzlich gibt er Name und E-Mail an.
+    Schritt 2: Konkreten Slot (Datum + Uhrzeit) auswählen.
     """
     timeslot = SelectField('Freie Termine', coerce=str, validators=[DataRequired()])
     customer_name = StringField('Name', validators=[DataRequired()])
@@ -23,11 +32,34 @@ class StatusForm(FlaskForm):
     appointment_number = StringField('Termin Nummer', validators=[DataRequired()])
     submit = SubmitField('Status prüfen')
 
-class AvailableDayForm(FlaskForm):
+class RecurringDayForm(FlaskForm):
+    """
+    Formular für das Hinzufügen mehrerer Wochentage (checkbox) + Datum-Beginn + Datum-Ende
+    + Start-/Endzeit + optionaler Pause.
+    """
+    days_of_week = MultiCheckboxField(
+        'Wochentag(e)',
+        choices=[
+            ('0', 'Montag'),
+            ('1', 'Dienstag'),
+            ('2', 'Mittwoch'),
+            ('3', 'Donnerstag'),
+            ('4', 'Freitag')
+        ],
+        validators=[DataRequired()]
+    )
+    start_date = DateField('Gültig ab (Datum)', format='%Y-%m-%d', validators=[DataRequired()])
+    end_date = DateField('Gültig bis (Datum)', format='%Y-%m-%d', validators=[DataRequired()])
+    start_time = TimeField('Startzeit', format='%H:%M', validators=[DataRequired()])
+    end_time = TimeField('Endzeit', format='%H:%M', validators=[DataRequired()])
+    break_start = TimeField('Pausen-Beginn', format='%H:%M')
+    break_end = TimeField('Pausen-Ende', format='%H:%M')
+    submit = SubmitField('Speichern')
+
+class ExcludedDayForm(FlaskForm):
     date = DateField('Datum', format='%Y-%m-%d', validators=[DataRequired()])
-    start_time = TimeField('Startzeit (HH:MM)', format='%H:%M', validators=[DataRequired()])
-    end_time = TimeField('Endzeit (HH:MM)', format='%H:%M', validators=[DataRequired()])
-    submit = SubmitField('Verfügbaren Tag hinzufügen')
+    reason = StringField('Grund (optional)')
+    submit = SubmitField('Ausschlusstag hinzufügen')
 
 class AppointmentTypeForm(FlaskForm):
     name = StringField('Terminart Name', validators=[DataRequired()])

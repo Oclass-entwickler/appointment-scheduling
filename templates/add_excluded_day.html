@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Einmaligen Ausschlusstag hinzufügen</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.date.label }}
+        {{ form.date(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.reason.label }}
+        {{ form.reason(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+<a href="{{ url_for('admin') }}" class="btn btn-secondary mt-3">Zurück</a>
+{% endblock %}

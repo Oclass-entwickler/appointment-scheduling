@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Wiederkehrende Wochentage hinzufügen</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <!-- Mehrfachauswahl der Wochentage -->
+    {% set selected_days = form.days_of_week.data or [] %}
+    <div class="form-group">
+        <label>{{ form.days_of_week.label }}</label><br>
+        {% for value, label in form.days_of_week.choices %}
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" 
+                   type="checkbox"
+                   name="{{ form.days_of_week.name }}"
+                   id="day_{{ value }}" 
+                   value="{{ value }}"
+                   {% if value in selected_days %}checked{% endif %}>
+            <label class="form-check-label" for="day_{{ value }}">{{ label }}</label>
+          </div>
+        {% endfor %}
+    </div>
+
+    <div class="form-group">
+        {{ form.start_date.label }}
+        {{ form.start_date(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.end_date.label }}
+        {{ form.end_date(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.start_time.label }}
+        {{ form.start_time(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.end_time.label }}
+        {{ form.end_time(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.break_start.label }}
+        {{ form.break_start(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.break_end.label }}
+        {{ form.break_end(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+<a href="{{ url_for('admin') }}" class="btn btn-secondary mt-3">Zurück</a>
+{% endblock %}
