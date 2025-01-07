@@ -221,32 +221,61 @@ def book_select_slot():
 def check_status():
     form = StatusForm()
     if form.validate_on_submit():
+        name = form.customer_name.data.strip().lower()
+        number = form.appointment_number.data.strip()
+
         try:
-            number = int(form.appointment_number.data)
-            appointment = Appointment.query.filter_by(appointment_number=number).first()
+            appointment = Appointment.query.filter(
+                db.func.lower(Appointment.customer_name) == name,
+                Appointment.appointment_number == int(number)
+            ).first()
+
             if appointment:
                 return render_template('view_status.html', appointment=appointment)
             else:
-                flash('Termin Nummer nicht gefunden.', 'warning')
+                flash('Kein Termin gefunden. Bitte überprüfen Sie die Angaben.', 'warning')
         except ValueError:
-            flash('Ungültige Nummer.', 'danger')
+            flash('Ungültige Eingabe. Bitte geben Sie die Daten korrekt ein.', 'danger')
+
     return render_template('check_status.html', form=form)
 
 # --- Admin-Bereich ---
 
-@app.route('/admin')
+# Admin-Bereich
+@app.route('/admin', methods=['GET', 'POST'])
 def admin():
-    appointments = Appointment.query.order_by(Appointment.date.desc(), Appointment.time.asc()).all()
-    types = AppointmentType.query.order_by(AppointmentType.name.asc()).all()
-    recurring_days = RecurringDay.query.order_by(RecurringDay.day_of_week.asc(), RecurringDay.start_date.asc()).all()
+    search_name = request.args.get('search', '').strip().lower()
+    appointments_query = Appointment.query
+
+    if search_name:
+        appointments_query = appointments_query.filter(
+            db.func.lower(Appointment.customer_name).contains(search_name)
+        )
+
+    appointments = appointments_query.order_by(Appointment.date.desc(), Appointment.time.asc()).all()
+    types = AppointmentType.query.all()
+    recurring_days = RecurringDay.query.order_by(RecurringDay.day_of_week.asc()).all()
     excluded_days = ExcludedDay.query.order_by(ExcludedDay.date.asc()).all()
+
     return render_template(
         'admin.html',
         appointments=appointments,
         types=types,
         recurring_days=recurring_days,
-        excluded_days=excluded_days
+        excluded_days=excluded_days,
+        search_name=search_name
     )
+
+
+# Termin löschen
+@app.route('/admin/delete/<int:appointment_id>', methods=['POST'])
+def delete_appointment(appointment_id):
+    appointment = Appointment.query.get_or_404(appointment_id)
+    db.session.delete(appointment)
+    db.session.commit()
+    flash(f'Termin mit Nummer {appointment.appointment_number} wurde gelöscht.', 'info')
+    return redirect(url_for('admin'))
+
 
 @app.route('/admin/recurring_day/add', methods=['GET', 'POST'])
 def add_recurring_day():

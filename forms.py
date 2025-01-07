@@ -65,3 +65,9 @@ class AppointmentTypeForm(FlaskForm):
     name = StringField('Terminart Name', validators=[DataRequired()])
     duration = IntegerField('Dauer (Minuten)', validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField('Terminart hinzufügen')
+
+
+class StatusForm(FlaskForm):
+    customer_name = StringField('Name', validators=[DataRequired()])
+    appointment_number = StringField('Termin Nummer', validators=[DataRequired()])
+    submit = SubmitField('Status prüfen')

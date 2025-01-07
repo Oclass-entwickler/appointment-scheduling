@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
+
+
 <h2>Admin-Bereich</h2>
+
+
 
 <!-- Recurring Days -->
 <h3>Wiederkehrende Wochentage (Montag-Freitag) mit Datum-Beginn / Datum-Ende</h3>
@@ -100,6 +104,15 @@
 
 <!-- Alle Termine -->
 <h3>Alle Termine</h3>
+
+<form method="GET" action="{{ url_for('admin') }}" class="form-inline mb-3">
+    <div class="form-group">
+        <input type="text" name="search" class="form-control mr-2"
+               placeholder="Nach Name suchen" value="{{ search_name }}">
+    </div>
+    <button type="submit" class="btn btn-outline-primary">Suchen</button>
+</form>
+
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -124,16 +137,12 @@
             <td>{{ appointment.time.strftime('%H:%M') }}</td>
             <td>{{ appointment.status }}</td>
             <td>
-                {% if appointment.status != 'Abgelehnt' %}
-                <form action="{{ url_for('reject_appointment', appointment_id=appointment.id) }}" method="POST" style="display:inline;">
+                <form action="{{ url_for('delete_appointment', appointment_id=appointment.id) }}" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-danger btn-sm"
-                            onclick="return confirm('Sind Sie sicher, dass Sie diesen Termin ablehnen möchten?');">
-                        Ablehnen
+                            onclick="return confirm('Sind Sie sicher, dass Sie diesen Termin löschen möchten?');">
+                        Löschen
                     </button>
                 </form>
-                {% else %}
-                <span class="text-muted">Abgelehnt</span>
-                {% endif %}
             </td>
         </tr>
     {% endfor %}
