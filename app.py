@@ -175,7 +175,7 @@ def book_select_slot():
 
     free_slots = get_free_slots_for_type(type_id)
     if not free_slots:
-        flash('Zurzeit sind keine freien Termine verfügbar.', 'warning')
+        flash('Zurzeit sind keine freien Termine für diese Terminart verfügbar.', 'warning')
         return redirect(url_for('book_select_type'))
 
     form = BookSlotForm()
@@ -186,36 +186,48 @@ def book_select_slot():
         try:
             slot_dt = datetime.strptime(slot_str, '%Y-%m-%d %H:%M')
         except ValueError:
-            flash('Ungültiger Termin-Slot.', 'danger')
+            flash('Ungültiger Termin-Slot ausgewählt.', 'danger')
             return redirect(url_for('book_select_slot', type_id=type_id))
 
-        # Eindeutige Termin-Nummer generieren
+        # Terminnummer generieren
         last_appointment = Appointment.query.order_by(Appointment.appointment_number.desc()).first()
         next_number = last_appointment.appointment_number + 1 if last_appointment else 1
 
+        # Termin speichern
         new_appointment = Appointment(
             appointment_number=next_number,
             type_id=int(type_id),
             customer_name=form.customer_name.data,
             customer_email=form.customer_email.data,
+            birth_date=form.birth_date.data,
             date=slot_dt.date(),
             time=slot_dt.time()
         )
         db.session.add(new_appointment)
         try:
             db.session.commit()
+
+            # Nachricht abrufen
+            appointment_type = AppointmentType.query.get(int(type_id))
+            notification_message = appointment_type.notification_message if appointment_type else ""
+
             flash(
-                f"Termin gebucht! Nr. {new_appointment.appointment_number} am "
-                f"{slot_dt.strftime('%Y-%m-%d')} um {slot_dt.strftime('%H:%M')} Uhr.",
+                f"Termin erfolgreich gebucht! Ihre Termin Nummer ist {new_appointment.appointment_number} "
+                f"am {slot_dt.strftime('%Y-%m-%d')} um {slot_dt.strftime('%H:%M')} Uhr.",
                 'success'
             )
-            return redirect(url_for('index'))
+            return render_template('booking_success.html',
+                                   appointment=new_appointment,
+                                   notification_message=notification_message)
         except IntegrityError:
             db.session.rollback()
-            flash('Ein Fehler ist aufgetreten. Bitte erneut versuchen.', 'danger')
+            flash('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.', 'danger')
             return redirect(url_for('book_select_slot', type_id=type_id))
 
     return render_template('book_slot.html', form=form)
+
+
+
 
 @app.route('/status', methods=['GET', 'POST'])
 def check_status():
@@ -223,11 +235,13 @@ def check_status():
     if form.validate_on_submit():
         name = form.customer_name.data.strip().lower()
         number = form.appointment_number.data.strip()
+        birth_date = form.birth_date.data
 
         try:
             appointment = Appointment.query.filter(
                 db.func.lower(Appointment.customer_name) == name,
-                Appointment.appointment_number == int(number)
+                Appointment.appointment_number == int(number),
+                Appointment.birth_date == birth_date
             ).first()
 
             if appointment:
@@ -350,7 +364,8 @@ def add_appointment_type():
 
         new_type = AppointmentType(
             name=form.name.data,
-            duration=form.duration.data
+            duration=form.duration.data,
+            notification_message=form.notification_message.data
         )
         db.session.add(new_type)
         try:
@@ -361,6 +376,7 @@ def add_appointment_type():
             db.session.rollback()
             flash('Datenbankfehler. Bitte erneut versuchen.', 'danger')
     return render_template('add_appointment_type.html', form=form)
+
 
 @app.route('/admin/reject/<int:appointment_id>', methods=['POST'])
 def reject_appointment(appointment_id):

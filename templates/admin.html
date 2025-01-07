@@ -90,6 +90,7 @@
         <tr>
             <th>Name</th>
             <th>Dauer (Minuten)</th>
+            <th>Benachrichtigung</th>
         </tr>
     </thead>
     <tbody>
@@ -97,28 +98,22 @@
         <tr>
             <td>{{ t.name }}</td>
             <td>{{ t.duration }}</td>
+            <td>{{ t.notification_message or 'Keine Nachricht hinterlegt.' }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
+
 <!-- Alle Termine -->
 <h3>Alle Termine</h3>
-
-<form method="GET" action="{{ url_for('admin') }}" class="form-inline mb-3">
-    <div class="form-group">
-        <input type="text" name="search" class="form-control mr-2"
-               placeholder="Nach Name suchen" value="{{ search_name }}">
-    </div>
-    <button type="submit" class="btn btn-outline-primary">Suchen</button>
-</form>
-
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Nr</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Geburtsdatum</th>
             <th>Terminart</th>
             <th>Datum</th>
             <th>Uhrzeit</th>
@@ -132,6 +127,7 @@
             <td>{{ appointment.appointment_number }}</td>
             <td>{{ appointment.customer_name }}</td>
             <td>{{ appointment.customer_email }}</td>
+            <td>{{ appointment.birth_date.strftime('%Y-%m-%d') }}</td>
             <td>{{ appointment.type.name }}</td>
             <td>{{ appointment.date.strftime('%Y-%m-%d') }}</td>
             <td>{{ appointment.time.strftime('%H:%M') }}</td>
@@ -148,4 +144,5 @@
     {% endfor %}
     </tbody>
 </table>
+
 {% endblock %}

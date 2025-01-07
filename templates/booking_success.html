@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Termin erfolgreich gebucht!</h2>
+    <p><strong>Name:</strong> {{ appointment.customer_name }}</p>
+    <p><strong>Termin Nummer:</strong> {{ appointment.appointment_number }}</p>
+    <p><strong>Datum:</strong> {{ appointment.date.strftime('%Y-%m-%d') }}</p>
+    <p><strong>Uhrzeit:</strong> {{ appointment.time.strftime('%H:%M') }}</p>
+
+    {% if notification_message %}
+    <div class="alert alert-info mt-4">
+        <strong>Wichtige Information:</strong>
+        <p>{{ notification_message }}</p>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">Zurück zur Startseite</a>
+</div>
+{% endblock %}

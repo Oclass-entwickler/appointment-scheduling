@@ -6,6 +6,7 @@
     <li class="list-group-item"><strong>Terminart:</strong> {{ appointment.type.name }}</li>
     <li class="list-group-item"><strong>Name:</strong> {{ appointment.customer_name }}</li>
     <li class="list-group-item"><strong>Email:</strong> {{ appointment.customer_email }}</li>
+    <li class="list-group-item"><strong>Geburtsdatum:</strong> {{ appointment.birth_date.strftime('%Y-%m-%d') }}</li>
     <li class="list-group-item"><strong>Status:</strong> {{ appointment.status }}</li>
     <li class="list-group-item"><strong>Datum:</strong> {{ appointment.date.strftime('%Y-%m-%d') }}</li>
     <li class="list-group-item"><strong>Uhrzeit:</strong> {{ appointment.time.strftime('%H:%M') }}</li>

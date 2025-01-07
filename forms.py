@@ -21,11 +21,12 @@ class BookTypeForm(FlaskForm):
 
 class BookSlotForm(FlaskForm):
     """
-    Schritt 2: Konkreten Slot (Datum + Uhrzeit) auswählen.
+    Schritt 2: Konkreten Slot (Datum + Uhrzeit) auswählen + Nutzerdetails eingeben.
     """
     timeslot = SelectField('Freie Termine', coerce=str, validators=[DataRequired()])
     customer_name = StringField('Name', validators=[DataRequired()])
     customer_email = StringField('Email', validators=[DataRequired(), Email()])
+    birth_date = DateField('Geburtsdatum', format='%Y-%m-%d', validators=[DataRequired()])  # Geburtsdatum
     submit = SubmitField('Termin buchen')
 
 class StatusForm(FlaskForm):
@@ -61,13 +62,18 @@ class ExcludedDayForm(FlaskForm):
     reason = StringField('Grund (optional)')
     submit = SubmitField('Ausschlusstag hinzufügen')
 
+from wtforms import TextAreaField
+
 class AppointmentTypeForm(FlaskForm):
     name = StringField('Terminart Name', validators=[DataRequired()])
     duration = IntegerField('Dauer (Minuten)', validators=[DataRequired(), NumberRange(min=1)])
+    notification_message = TextAreaField('Benachrichtigung (optional)')
     submit = SubmitField('Terminart hinzufügen')
+
 
 
 class StatusForm(FlaskForm):
     customer_name = StringField('Name', validators=[DataRequired()])
     appointment_number = StringField('Termin Nummer', validators=[DataRequired()])
+    birth_date = DateField('Geburtsdatum (YYYY-MM-DD)', format='%Y-%m-%d', validators=[DataRequired()])
     submit = SubmitField('Status prüfen')
