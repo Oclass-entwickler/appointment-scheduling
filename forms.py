@@ -1,79 +1,79 @@
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, SelectField, SelectMultipleField,
-    TimeField, DateField, IntegerField, SubmitField, widgets
+    TimeField, DateField, IntegerField, SubmitField, widgets, TextAreaField
 )
 from wtforms.validators import DataRequired, Email, NumberRange
 
 class MultiCheckboxField(SelectMultipleField):
     """
-    Ein Mehrfachauswahlfeld für Wochentage (z.B. Montag, Dienstag, etc.).
+    حقل اختيار متعدد (Checkbox) لأيام الأسبوع.
     """
     widget = widgets.ListWidget(prefix_label=False)
     option_widget = widgets.CheckboxInput()
 
 class BookTypeForm(FlaskForm):
     """
-    Schritt 1: Terminart auswählen.
+    الخطوة 1: اختيار نوع الموعد.
     """
-    appointment_type = SelectField('Terminart', coerce=int, validators=[DataRequired()])
-    submit = SubmitField('Weiter')
+    appointment_type = SelectField('نوع الموعد', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('التالي')
 
 class BookSlotForm(FlaskForm):
     """
-    Schritt 2: Konkreten Slot (Datum + Uhrzeit) auswählen + Nutzerdetails eingeben.
+    الخطوة 2: اختيار وقت محدد وإدخال تفاصيل المستخدم.
     """
-    timeslot = SelectField('Freie Termine', coerce=str, validators=[DataRequired()])
-    customer_name = StringField('Name', validators=[DataRequired()])
-    customer_email = StringField('Email', validators=[DataRequired(), Email()])
-    birth_date = DateField('Geburtsdatum', format='%Y-%m-%d', validators=[DataRequired()])  # Geburtsdatum
-    submit = SubmitField('Termin buchen')
+    timeslot = SelectField('الأوقات المتاحة', coerce=str, validators=[DataRequired()])
+    customer_name = StringField('الاسم', validators=[DataRequired()])
+    customer_email = StringField('البريد الإلكتروني', validators=[DataRequired(), Email()])
+    birth_date = DateField('تاريخ الميلاد (YYYY-MM-DD)', format='%Y-%m-%d', validators=[DataRequired()])
+    submit = SubmitField('حجز الموعد')
 
 class StatusForm(FlaskForm):
-    appointment_number = StringField('Termin Nummer', validators=[DataRequired()])
-    submit = SubmitField('Status prüfen')
+    """
+    التحقق من حالة الموعد.
+    """
+    customer_name = StringField('الاسم', validators=[DataRequired()])
+    appointment_number = StringField('رقم الموعد', validators=[DataRequired()])
+    birth_date = DateField('تاريخ الميلاد (YYYY-MM-DD)', format='%Y-%m-%d', validators=[DataRequired()])
+    submit = SubmitField('التحقق من الحالة')
 
 class RecurringDayForm(FlaskForm):
     """
-    Formular für das Hinzufügen mehrerer Wochentage (checkbox) + Datum-Beginn + Datum-Ende
-    + Start-/Endzeit + optionaler Pause.
+    نموذج لإضافة أيام الأسبوع المتكررة مع التواريخ وأوقات العمل.
     """
     days_of_week = MultiCheckboxField(
-        'Wochentag(e)',
+        'أيام الأسبوع',
         choices=[
-            ('0', 'Montag'),
-            ('1', 'Dienstag'),
-            ('2', 'Mittwoch'),
-            ('3', 'Donnerstag'),
-            ('4', 'Freitag')
+            ('0', 'الاثنين'),
+            ('1', 'الثلاثاء'),
+            ('2', 'الأربعاء'),
+            ('3', 'الخميس'),
+            ('4', 'الجمعة')
         ],
         validators=[DataRequired()]
     )
-    start_date = DateField('Gültig ab (Datum)', format='%Y-%m-%d', validators=[DataRequired()])
-    end_date = DateField('Gültig bis (Datum)', format='%Y-%m-%d', validators=[DataRequired()])
-    start_time = TimeField('Startzeit', format='%H:%M', validators=[DataRequired()])
-    end_time = TimeField('Endzeit', format='%H:%M', validators=[DataRequired()])
-    break_start = TimeField('Pausen-Beginn', format='%H:%M')
-    break_end = TimeField('Pausen-Ende', format='%H:%M')
-    submit = SubmitField('Speichern')
+    start_date = DateField('تاريخ البداية (YYYY-MM-DD)', format='%Y-%m-%d', validators=[DataRequired()])
+    end_date = DateField('تاريخ النهاية (YYYY-MM-DD)', format='%Y-%m-%d', validators=[DataRequired()])
+    start_time = TimeField('وقت البداية (HH:MM)', format='%H:%M', validators=[DataRequired()])
+    end_time = TimeField('وقت النهاية (HH:MM)', format='%H:%M', validators=[DataRequired()])
+    break_start = TimeField('بداية الاستراحة (HH:MM)', format='%H:%M')
+    break_end = TimeField('نهاية الاستراحة (HH:MM)', format='%H:%M')
+    submit = SubmitField('حفظ')
 
 class ExcludedDayForm(FlaskForm):
-    date = DateField('Datum', format='%Y-%m-%d', validators=[DataRequired()])
-    reason = StringField('Grund (optional)')
-    submit = SubmitField('Ausschlusstag hinzufügen')
-
-from wtforms import TextAreaField
+    """
+    نموذج لإضافة يوم استثناء.
+    """
+    date = DateField('التاريخ (YYYY-MM-DD)', format='%Y-%m-%d', validators=[DataRequired()])
+    reason = StringField('السبب (اختياري)')
+    submit = SubmitField('إضافة يوم الاستثناء')
 
 class AppointmentTypeForm(FlaskForm):
-    name = StringField('Terminart Name', validators=[DataRequired()])
-    duration = IntegerField('Dauer (Minuten)', validators=[DataRequired(), NumberRange(min=1)])
-    notification_message = TextAreaField('Benachrichtigung (optional)')
-    submit = SubmitField('Terminart hinzufügen')
-
-
-
-class StatusForm(FlaskForm):
-    customer_name = StringField('Name', validators=[DataRequired()])
-    appointment_number = StringField('Termin Nummer', validators=[DataRequired()])
-    birth_date = DateField('Geburtsdatum (YYYY-MM-DD)', format='%Y-%m-%d', validators=[DataRequired()])
-    submit = SubmitField('Status prüfen')
+    """
+    نموذج لإضافة نوع الموعد.
+    """
+    name = StringField('اسم نوع الموعد', validators=[DataRequired()])
+    duration = IntegerField('المدة (بالدقائق)', validators=[DataRequired(), NumberRange(min=1)])
+    notification_message = TextAreaField('رسالة الإشعار (اختياري)')
+    submit = SubmitField('إضافة نوع الموعد')

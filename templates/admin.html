@@ -1,164 +1,290 @@
 {% extends "base.html" %}
 {% block content %}
 
+<div class="container py-5" dir="rtl">
+    <h2 class="mb-4 fw-bold text-primary">لوحة التحكم الإدارية</h2>
 
-<h2>Admin-Bereich</h2>
-
-
-
-<!-- Recurring Days -->
-<h3>Wiederkehrende Wochentage (Montag-Freitag) mit Datum-Beginn / Datum-Ende</h3>
-<a href="{{ url_for('add_recurring_day') }}" class="btn btn-success mb-2">Wochentag(e) hinzufügen</a>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Wochentag</th>
-            <th>Gültig von</th>
-            <th>Gültig bis</th>
-            <th>Start</th>
-            <th>Ende</th>
-            <th>Pause</th>
-            <th>Aktion</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for rd in recurring_days %}
-        <tr>
-            <td>
-                {% if rd.day_of_week == 0 %}Montag{% elif rd.day_of_week == 1 %}Dienstag
-                {% elif rd.day_of_week == 2 %}Mittwoch{% elif rd.day_of_week == 3 %}Donnerstag
-                {% elif rd.day_of_week == 4 %}Freitag{% endif %}
-            </td>
-            <td>{{ rd.start_date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ rd.end_date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ rd.start_time.strftime('%H:%M') }}</td>
-            <td>{{ rd.end_time.strftime('%H:%M') }}</td>
-            <td>
-                {% if rd.break_start and rd.break_end %}
-                  {{ rd.break_start.strftime('%H:%M') }} - {{ rd.break_end.strftime('%H:%M') }}
-                {% else %}
-                  Keine
-                {% endif %}
-            </td>
-            <td>
-                <form action="{{ url_for('delete_recurring_day', rd_id=rd.id) }}" method="POST" style="display:inline;">
-                    <button class="btn btn-danger btn-sm"
-                            onclick="return confirm('Diesen Wochentag wirklich löschen?');">
-                      Löschen
-                    </button>
-                </form>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-
-<!-- Excluded Days -->
-<h3>Einmalige Ausschlusstage</h3>
-<a href="{{ url_for('add_excluded_day') }}" class="btn btn-success mb-2">Ausschlusstag hinzufügen</a>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Datum</th>
-            <th>Grund</th>
-            <th>Aktion</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for ex in excluded_days %}
-        <tr>
-            <td>{{ ex.date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ ex.reason }}</td>
-            <td>
-                <form action="{{ url_for('delete_excluded_day', ex_id=ex.id) }}" method="POST" style="display:inline;">
-                    <button class="btn btn-danger btn-sm"
-                            onclick="return confirm('Diesen Ausschlusstag wirklich löschen?');">
-                      Löschen
-                    </button>
-                </form>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-
-<!-- Terminarten -->
-<h3>Terminarten</h3>
-<a href="{{ url_for('add_appointment_type') }}" class="btn btn-success mb-2">Terminart hinzufügen</a>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Dauer (Minuten)</th>
-            <th>Benachrichtigung</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for t in types %}
-        <tr>
-            <td>{{ t.name }}</td>
-            <td>{{ t.duration }}</td>
-            <td>{{ t.notification_message or 'Keine Nachricht hinterlegt.' }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-
-<!-- Alle Termine -->
-<h3>Alle Termine</h3>
-<form method="GET" action="{{ url_for('admin') }}" class="form-inline mb-3">
-    <div class="form-group">
-        <input type="text" name="search" class="form-control mr-2"
-               placeholder="Nach Name suchen" value="{{ search_name }}">
+    <!-- Cards Summary -->
+    <div class="row mb-5">
+        {% with card_classes=["primary", "success", "warning", "info"] %}
+            {% for card_class, title, value in 
+                [
+                    ["primary", "إجمالي المواعيد", appointments|length],
+                    ["success", "المواعيد المؤكدة", appointments|selectattr('status', 'equalto', 'مؤكد')|list|length],
+                    ["warning", "المواعيد المعلقة", appointments|selectattr('status', 'equalto', 'معلق')|list|length],
+                    ["info", "أنواع المواعيد", types|length]
+                ]
+            %}
+                <div class="col-md-3 mb-3">
+                    <div class="card text-white bg-{{ card_class }} shadow-sm h-100">
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                            <h5 class="card-title">{{ title }}</h5>
+                            <h3 class="mb-0">{{ value }}</h3>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endwith %}
     </div>
-    <button type="submit" class="btn btn-outline-primary">Suchen</button>
-</form>
 
-
-<form action="{{ url_for('cleanup_old_appointments') }}" method="POST" style="display:inline;">
-    <button class="btn btn-warning" onclick="return confirm('Wirklich alle alten Termine löschen?');">
-        Alte Termine aufräumen
-    </button>
-</form>
-
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Nr</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Geburtsdatum</th>
-            <th>Terminart</th>
-            <th>Datum</th>
-            <th>Uhrzeit</th>
-            <th>Status</th>
-            <th>Aktion</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for appointment in appointments %}
-        <tr>
-            <td>{{ appointment.appointment_number }}</td>
-            <td>{{ appointment.customer_name }}</td>
-            <td>{{ appointment.customer_email }}</td>
-            <td>{{ appointment.birth_date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ appointment.type.name }}</td>
-            <td>{{ appointment.date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ appointment.time.strftime('%H:%M') }}</td>
-            <td>{{ appointment.status }}</td>
-            <td>
-                <form action="{{ url_for('delete_appointment', appointment_id=appointment.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-sm"
-                            onclick="return confirm('Sind Sie sicher, dass Sie diesen Termin löschen möchten?');">
-                        Löschen
+    <!-- Main Tabs -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="recurring-tab" data-bs-toggle="tab" data-bs-target="#recurring" type="button" role="tab" aria-controls="recurring" aria-selected="true">
+                        <i class="fas fa-calendar-alt me-2"></i>الأيام المتكررة
                     </button>
-                </form>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="excluded-tab" data-bs-toggle="tab" data-bs-target="#excluded" type="button" role="tab" aria-controls="excluded" aria-selected="false">
+                        <i class="fas fa-ban me-2"></i>الأيام المستثناة
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="types-tab" data-bs-toggle="tab" data-bs-target="#types" type="button" role="tab" aria-controls="types" aria-selected="false">
+                        <i class="fas fa-tags me-2"></i>أنواع المواعيد
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="false">
+                        <i class="fas fa-calendar-check me-2"></i>جميع المواعيد
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="adminTabsContent">
+                <!-- Recurring Days -->
+                <div class="tab-pane fade show active" id="recurring" role="tabpanel" aria-labelledby="recurring-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>الأيام المتكررة</h4>
+                        <a href="{{ url_for('add_recurring_day') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>إضافة يوم جديد
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>اليوم</th>
+                                    <th>من تاريخ</th>
+                                    <th>إلى تاريخ</th>
+                                    <th>وقت البدء</th>
+                                    <th>وقت الانتهاء</th>
+                                    <th>فترة الراحة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for rd in recurring_days %}
+                                <tr>
+                                    <td>
+                                        {% if rd.day_of_week == 0 %}الاثنين
+                                        {% elif rd.day_of_week == 1 %}الثلاثاء
+                                        {% elif rd.day_of_week == 2 %}الأربعاء
+                                        {% elif rd.day_of_week == 3 %}الخميس
+                                        {% elif rd.day_of_week == 4 %}الجمعة{% endif %}
+                                    </td>
+                                    <td>{{ rd.start_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ rd.end_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ rd.start_time.strftime('%H:%M') }}</td>
+                                    <td>{{ rd.end_time.strftime('%H:%M') }}</td>
+                                    <td>
+                                        {% if rd.break_start and rd.break_end %}
+                                            {{ rd.break_start.strftime('%H:%M') }} - {{ rd.break_end.strftime('%H:%M') }}
+                                        {% else %}
+                                            لا يوجد
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <!-- Formular löschen -->
+                                        <form action="{{ url_for('delete_recurring_day', rd_id=rd.id) }}" method="POST" style="display:inline;"
+                                              onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="حذف">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Excluded Days -->
+                <div class="tab-pane fade" id="excluded" role="tabpanel" aria-labelledby="excluded-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>الأيام المستثناة</h4>
+                        <a href="{{ url_for('add_excluded_day') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>إضافة استثناء
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>السبب</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for ex in excluded_days %}
+                                <tr>
+                                    <td>{{ ex.date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ ex.reason }}</td>
+                                    <td>
+                                        <form action="{{ url_for('delete_excluded_day', ex_id=ex.id) }}" method="POST" style="display:inline;"
+                                              onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="حذف">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Appointment Types -->
+                <div class="tab-pane fade" id="types" role="tabpanel" aria-labelledby="types-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>أنواع المواعيد</h4>
+                        <a href="{{ url_for('add_appointment_type') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>إضافة نوع جديد
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>النوع</th>
+                                    <th>المدة (دقيقة)</th>
+                                    <th>رسالة التنبيه</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for t in types %}
+                                <tr>
+                                    <td>{{ t.name }}</td>
+                                    <td>{{ t.duration }}</td>
+                                    <td>{{ t.notification_message or 'لا توجد رسالة' }}</td>
+                                    <td>
+                                        <form action="{{ url_for('delete_appointment_type', t_id=t.id) }}" method="POST" style="display:inline;"
+                                              onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="حذف">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+<!-- All Appointments -->
+<!-- All Appointments -->
+<div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Live-Search (nur nach Name + رقم) -->
+        <div class="d-flex flex-grow-1 align-items-center me-3">
+            <label for="searchInput" class="me-2 fw-bold">بحث:</label>
+            <input type="text" id="searchInput" class="form-control" style="max-width: 250px;"
+                   placeholder="بحث بالاسم أو الرقم...">
+        </div>
+        <!-- Cleanup-Button -->
+        <form action="{{ url_for('cleanup_old_appointments') }}" method="POST">
+            <button class="btn btn-warning" onclick="return confirm('هل تريد حقًا حذف جميع المواعيد القديمة؟');">
+                <i class="fas fa-broom me-2"></i>تنظيف المواعيد القديمة
+            </button>
+        </form>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-striped table-hover" id="appointmentsTable">
+            <thead class="table-light">
+                <tr>
+                    <th>الرقم</th>          <!-- appointment_number -->
+                    <th>الاسم</th>          <!-- customer_name -->
+                    <th>البريد الإلكتروني</th>
+                    <th>تاريخ الميلاد</th>
+                    <th>نوع الموعد</th>
+                    <th>التاريخ</th>
+                    <th>الوقت</th>
+                    <th>الحالة</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for appointment in appointments %}
+                <tr>
+                    <td>{{ appointment.appointment_number }}</td>
+                    <td>{{ appointment.customer_name }}</td>
+                    <td>{{ appointment.customer_email }}</td>
+                    <td>{{ appointment.birth_date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ appointment.type.name }}</td>
+                    <td>{{ appointment.date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ appointment.time.strftime('%H:%M') }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if appointment.status == 'مؤكد' %}bg-success
+                            {% elif appointment.status == 'معلق' %}bg-warning
+                            {% else %}bg-danger{% endif %}">
+                            {{ appointment.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('delete_appointment', appointment_id=appointment.id) }}"
+                              method="POST" style="display:inline;"
+                              onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
+                            <button type="submit" class="btn btn-outline-danger btn-sm" title="حذف">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.getElementById('searchInput');
+    var appointmentsTable = document.getElementById('appointmentsTable');
+
+    searchInput.addEventListener('input', function() {
+        var filterText = searchInput.value.toLowerCase();
+        var rows = appointmentsTable.getElementsByTagName('tr');
+
+        // Ab Zeile 1 (Index 0 = <thead>)
+        for (var i = 1; i < rows.length; i++) {
+            var row = rows[i];
+            var cells = row.getElementsByTagName('td');
+            
+            // Nur Spalten 0 ("الرقم") und 1 ("الاسم") durchsuchen:
+            if (cells.length >= 2) {
+                var refNumberText = cells[0].innerText.toLowerCase();
+                var nameText      = cells[1].innerText.toLowerCase();
+
+                // Zeige Zeile an, wenn Filter in referNumber ODER Name vorkommt
+                if (refNumberText.indexOf(filterText) > -1 || nameText.indexOf(filterText) > -1) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+    });
+});
+</script>
+
 
 {% endblock %}

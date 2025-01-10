@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Verfügbaren Tag hinzufügen</h2>
+<h2>إضافة يوم متاح</h2>
 <form method="POST">
     {{ form.hidden_tag() }}
     <div class="form-group">
@@ -19,5 +19,5 @@
         {{ form.submit(class="btn btn-primary") }}
     </div>
 </form>
-<a href="{{ url_for('admin') }}" class="btn btn-secondary mt-3">Zurück</a>
+<a href="{{ url_for('admin') }}" class="btn btn-secondary mt-3">العودة</a>
 {% endblock %}

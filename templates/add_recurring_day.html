@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Wiederkehrende Wochentage hinzufügen</h2>
+<h2>إضافة أيام أسبوعية متكررة</h2>
 <form method="POST">
     {{ form.hidden_tag() }}
 
-    <!-- Mehrfachauswahl der Wochentage -->
+    <!-- اختيار متعدد لأيام الأسبوع -->
     {% set selected_days = form.days_of_week.data or [] %}
     <div class="form-group">
         <label>{{ form.days_of_week.label }}</label><br>
@@ -49,5 +49,5 @@
         {{ form.submit(class="btn btn-primary") }}
     </div>
 </form>
-<a href="{{ url_for('admin') }}" class="btn btn-secondary mt-3">Zurück</a>
+<a href="{{ url_for('admin') }}" class="btn btn-secondary mt-3">العودة</a>
 {% endblock %}

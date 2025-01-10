@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Syrische Botschaft - Terminvergabesystem</title>
+    <title>السفارة السورية - نظام حجز المواعيد</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .hero-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/api/placeholder/1920/1080');
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ url_for('static', filename='background/Citadel_of_Aleppo.jpg') }}');
             background-size: cover;
             background-position: center;
             color: white;
@@ -49,20 +49,19 @@
 <body>
     <div class="hero-section" style="background-image: url('{{ url_for('static', filename='background/Citadel_of_Aleppo.jpg') }}'); height: 500px; background-size: cover; background-position: center;">
         <div class="container text-center text-light">
-            <h1 class="display-4 mb-4">Willkommen beim Terminvergabesystem<br>der Syrischen Botschaft</h1>
-            <p class="lead mb-5">Einfach und schnell Ihren Termin online buchen und verwalten</p>
+            <h1 class="display-4 mb-4">مرحبًا بكم في نظام حجز المواعيد<br>للسفارة السورية</h1>
+            <p class="lead mb-5">قم بحجز وإدارة موعدك بسهولة وسرعة عبر الإنترنت</p>
             <div class="d-flex justify-content-center gap-3">
                 <a href="{{ url_for('book_select_type') }}" class="btn btn-primary btn-lg btn-custom">
-                    Termin buchen
+                    حجز موعد
                 </a>
                 <a href="{{ url_for('check_status') }}" class="btn btn-light btn-lg btn-custom">
-                    Status prüfen
+                    التحقق من الحالة
                 </a>
             </div>
         </div>
     </div>
     
-
     <div class="container py-5">
         <div class="row g-4">
             <div class="col-md-4">
@@ -75,8 +74,8 @@
                             <line x1="3" y1="10" x2="21" y2="10"></line>
                         </svg>
                     </div>
-                    <h3 class="h5 mb-3">Flexible Terminauswahl</h3>
-                    <p class="text-muted">Wählen Sie aus verschiedenen verfügbaren Terminen den für Sie passenden aus.</p>
+                    <h3 class="h5 mb-3">اختيار مرن للمواعيد</h3>
+                    <p class="text-muted">اختر من بين المواعيد المتاحة ما يناسبك بسهولة.</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -87,8 +86,8 @@
                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
                     </div>
-                    <h3 class="h5 mb-3">Einfache Verwaltung</h3>
-                    <p class="text-muted">Verwalten Sie Ihre Termine bequem online und behalten Sie den Überblick.</p>
+                    <h3 class="h5 mb-3">إدارة سهلة</h3>
+                    <p class="text-muted">قم بإدارة مواعيدك بسهولة عبر الإنترنت واحتفظ بجدولك منظمًا.</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -100,8 +99,8 @@
                             <line x1="12" y1="8" x2="12.01" y2="8"></line>
                         </svg>
                     </div>
-                    <h3 class="h5 mb-3">Statusübersicht</h3>
-                    <p class="text-muted">Überprüfen Sie jederzeit den aktuellen Status Ihres Termins.</p>
+                    <h3 class="h5 mb-3">عرض حالة الموعد</h3>
+                    <p class="text-muted">تحقق من حالة موعدك في أي وقت بسهولة.</p>
                 </div>
             </div>
         </div>

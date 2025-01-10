@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Status Ihres Termins</h2>
+<h2>حالة الموعد الخاص بك</h2>
 <ul class="list-group">
-    <li class="list-group-item"><strong>Termin Nummer:</strong> {{ appointment.appointment_number }}</li>
-    <li class="list-group-item"><strong>Terminart:</strong> {{ appointment.type.name }}</li>
-    <li class="list-group-item"><strong>Name:</strong> {{ appointment.customer_name }}</li>
-    <li class="list-group-item"><strong>Email:</strong> {{ appointment.customer_email }}</li>
-    <li class="list-group-item"><strong>Geburtsdatum:</strong> {{ appointment.birth_date.strftime('%Y-%m-%d') }}</li>
-    <li class="list-group-item"><strong>Status:</strong> {{ appointment.status }}</li>
-    <li class="list-group-item"><strong>Datum:</strong> {{ appointment.date.strftime('%Y-%m-%d') }}</li>
-    <li class="list-group-item"><strong>Uhrzeit:</strong> {{ appointment.time.strftime('%H:%M') }}</li>
+    <li class="list-group-item"><strong>رقم الموعد:</strong> {{ appointment.appointment_number }}</li>
+    <li class="list-group-item"><strong>نوع الموعد:</strong> {{ appointment.type.name }}</li>
+    <li class="list-group-item"><strong>الاسم:</strong> {{ appointment.customer_name }}</li>
+    <li class="list-group-item"><strong>البريد الإلكتروني:</strong> {{ appointment.customer_email }}</li>
+    <li class="list-group-item"><strong>تاريخ الميلاد:</strong> {{ appointment.birth_date.strftime('%Y-%m-%d') }}</li>
+    <li class="list-group-item"><strong>الحالة:</strong> {{ appointment.status }}</li>
+    <li class="list-group-item"><strong>التاريخ:</strong> {{ appointment.date.strftime('%Y-%m-%d') }}</li>
+    <li class="list-group-item"><strong>الوقت:</strong> {{ appointment.time.strftime('%H:%M') }}</li>
 </ul>
-<a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Zurück</a>
+<a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">العودة</a>
 {% endblock %}
