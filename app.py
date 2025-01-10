@@ -7,9 +7,11 @@ from forms import (
 )
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta, date, time
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.config.from_object(Config)
+mail = Mail(app) 
 db.init_app(app)
 
 # -----------------------------------
@@ -189,11 +191,10 @@ def book_select_slot():
             flash('Ungültiger Termin-Slot ausgewählt.', 'danger')
             return redirect(url_for('book_select_slot', type_id=type_id))
 
-        # Terminnummer generieren
+        # 1) Termin speichern
         last_appointment = Appointment.query.order_by(Appointment.appointment_number.desc()).first()
         next_number = last_appointment.appointment_number + 1 if last_appointment else 1
 
-        # Termin speichern
         new_appointment = Appointment(
             appointment_number=next_number,
             type_id=int(type_id),
@@ -204,25 +205,49 @@ def book_select_slot():
             time=slot_dt.time()
         )
         db.session.add(new_appointment)
+
         try:
             db.session.commit()
-
-            # Nachricht abrufen
-            appointment_type = AppointmentType.query.get(int(type_id))
-            notification_message = appointment_type.notification_message if appointment_type else ""
-
-            flash(
-                f"Termin erfolgreich gebucht! Ihre Termin Nummer ist {new_appointment.appointment_number} "
-                f"am {slot_dt.strftime('%Y-%m-%d')} um {slot_dt.strftime('%H:%M')} Uhr.",
-                'success'
-            )
-            return render_template('booking_success.html',
-                                   appointment=new_appointment,
-                                   notification_message=notification_message)
-        except IntegrityError:
+        except:
             db.session.rollback()
-            flash('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.', 'danger')
+            flash('Datenbankfehler. Bitte erneut versuchen.', 'danger')
             return redirect(url_for('book_select_slot', type_id=type_id))
+
+        # 2) E-Mail an den Nutzer versenden
+        # --------------------------------
+        msg = Message(
+            subject="Terminbestätigung",
+            recipients=[new_appointment.customer_email]
+        )
+
+
+        # E-Mail-Inhalt
+        msg.body = f"""
+Hallo {new_appointment.customer_name},
+
+Sie haben gerade einen Termin gebucht!
+
+Termin-Nummer: {new_appointment.appointment_number}
+Datum: {new_appointment.date.strftime('%Y-%m-%d')}
+Uhrzeit: {new_appointment.time.strftime('%H:%M')}
+
+Vielen Dank!
+Ihr Botschaftsteam
+"""
+
+        # Falls Sie HTML-formatierte E-Mails senden wollen, können Sie msg.html verwenden
+        # msg.html = render_template('email_template.html', appointment=new_appointment)
+
+        # Tatsächlicher E-Mail-Versand
+        mail.send(msg)
+
+        # 3) Feedback an den Nutzer in der Web-App (Flash / Weiterleitung)
+        flash("Termin erfolgreich gebucht! Sie erhalten in Kürze eine Bestätigungs-E-Mail.", "success")
+        return render_template(
+            'booking_success.html',
+            appointment=new_appointment,
+            notification_message=""
+        )
 
     return render_template('book_slot.html', form=form)
 
@@ -279,6 +304,21 @@ def admin():
         excluded_days=excluded_days,
         search_name=search_name
     )
+    
+
+@app.route('/admin/cleanup', methods=['POST'])
+def cleanup_old_appointments():
+    from datetime import date, timedelta
+    threshold_date = date.today() - timedelta(days=2)
+    
+    old_appointments = Appointment.query.filter(Appointment.date < threshold_date).all()
+    for old_appt in old_appointments:
+        db.session.delete(old_appt)
+    db.session.commit()
+
+    flash(f"Alte Termine vor dem {threshold_date} wurden gelöscht.", "info")
+    return redirect(url_for('admin'))
+
 
 
 # Termin löschen

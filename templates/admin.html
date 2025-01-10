@@ -107,6 +107,22 @@
 
 <!-- Alle Termine -->
 <h3>Alle Termine</h3>
+<form method="GET" action="{{ url_for('admin') }}" class="form-inline mb-3">
+    <div class="form-group">
+        <input type="text" name="search" class="form-control mr-2"
+               placeholder="Nach Name suchen" value="{{ search_name }}">
+    </div>
+    <button type="submit" class="btn btn-outline-primary">Suchen</button>
+</form>
+
+
+<form action="{{ url_for('cleanup_old_appointments') }}" method="POST" style="display:inline;">
+    <button class="btn btn-warning" onclick="return confirm('Wirklich alle alten Termine löschen?');">
+        Alte Termine aufräumen
+    </button>
+</form>
+
+
 <table class="table table-bordered">
     <thead>
         <tr>
