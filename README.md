@@ -51,9 +51,16 @@ http://127.0.0.1:5000
 
 Beispiel `.env`:
 ```
-MAIL_USERNAME=hasankeisar@gmail.com oder  $env:MAIL_USERNAME = "hasankeisar@gmail.com"
+MAIL_USERNAME=hasankeisar@gmail.com oder  
 MAIL_PASSWORD=mein_app_passwort
 MAIL_DEFAULT_SENDER=hasankeisar@gmail.com
+
+or
+
+$env:MAIL_USERNAME = "hasankeisar@gmail.com"
+$env:MAIL_PASSWORD = "oate yljt eetx uokp"
+$env:MAIL_DEFAULT_SENDER = "hasankeisar@gmail.com"
+
 ```
 
 Anschließend werden nach erfolgreicher Terminbuchung Bestätigungs-E-Mails versendet.
